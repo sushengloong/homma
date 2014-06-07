@@ -3,24 +3,24 @@ module Homma
 
     attr_accessor :events, :start_date, :end_date, :current_date,
       :symbols, :starting_capital, :commission_per_trade,
-      :logger
+      :feeder, :logger
 
     def initialize
       # states
       @events = []
-      @start_date = nil || Date.new(2010, 01, 01)
+      @start_date = nil || Date.new(2014, 01, 01)
       @end_date = nil || Date.today
       @current_date = @start_date
-      @symbols = %w{ AAPL FB GOOGL MSFT TWTR }
+      @symbols = %w{ AAPL FB }
       @starting_capital = 10_000
       @commission_per_trade = 25
 
       # components
       @logger = nil || Logger.new(STDOUT)
       @feeder = nil || YahooFinanceFeeder.new(self)
+      @strategy = nil || MovingAverageCrossoverStrategy.new(self, 50, 250)
       @broker = nil
       @portfolio = nil
-      @strategy = nil
     end
 
     def start_trading
@@ -52,8 +52,9 @@ module Homma
           @logger.info event.type
           case event.type
           when :bar
-            @logger.info event.data[:latest_bar]
+            @strategy.on_bar event.data[:latest_bar]
           when :signal
+            @logger.debug event.data[:direction]
           when :order
           when :fill
           else

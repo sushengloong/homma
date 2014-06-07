@@ -5,7 +5,7 @@ module Homma
 
     BASE_URL = 'http://ichart.finance.yahoo.com/table.csv'
 
-    attr_accessor :cache_bars
+    attr_accessor :cache_bars, :market_data
 
     def initialize context
       @context = context
