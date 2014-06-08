@@ -11,7 +11,7 @@ module Homma
       @start_date = nil || Date.new(2014, 01, 01)
       @end_date = nil || Date.today
       @current_date = @start_date
-      @symbols = nil || %w{ AAPL FB MSFT ORCL }
+      @symbols = ['AAPL'] || %w{ AAPL FB MSFT ORCL }
       @starting_capital = nil || 10_000
       @commission_per_trade = nil || 25
 
@@ -39,7 +39,7 @@ module Homma
 
         loop do
           if @events.empty?
-            @logger.info "No more event, move on to next outer loop"
+            @logger.info ""
             break
           end
 
@@ -49,7 +49,7 @@ module Homma
             next
           end
 
-          @logger.info "#{event.data[:symbol]}: #{event.type}"
+          @logger.info ">>> #{event.data[:symbol]}: #{event.type}"
           case event.type
           when :bar
             @strategy.on_bar event.data[:latest_bar]
@@ -63,8 +63,24 @@ module Homma
           else
             @logger.warn "Unknown event type #{event.type}"
           end
-        end
-      end
+
+          @logger.info "Current Position:"
+          @logger.info @portfolio.current_positions
+          @logger.info "Current Holding:"
+          @logger.info @portfolio.current_holdings
+          @logger.info "Cash: #{@portfolio.cash.round(3)}"
+          @logger.info "Commission: #{@portfolio.commission.round(3)}"
+          @logger.info "Total: #{@portfolio.total.round(3)}"
+
+        end # inner loop
+      end # outer loop
+
+      output_performance
+    end
+
+    def output_performance
+      # @logger.info @portfolio.equity_curve
+      # @logger.info @portfolio.summary
     end
 
     def trading_ended?
