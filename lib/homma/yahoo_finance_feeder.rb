@@ -62,7 +62,14 @@ module Homma
         end
         @cache_bars[symbol] = []
         CSV.parse(response.body, headers: true, header_converters: :symbol) do |row|
-          @cache_bars[symbol] << row.to_hash
+          row = row.to_hash
+          %i{ volume }.each do |attr|
+            row[attr]= row[attr].to_i
+          end
+          %i{ open high low close adj_close }.each do |attr|
+            row[attr]= row[attr].to_f
+          end
+          @cache_bars[symbol] << row
         end
         @cache_bars[symbol].reverse! # Yahoo CSV data needs reversal
         @cache_symbols = @cache_bars.keys # refresh cache keys

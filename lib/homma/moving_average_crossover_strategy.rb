@@ -16,10 +16,10 @@ module Homma
         short_sma = moving_average symbol, @short_lookback_period
         long_sma = moving_average symbol, @long_lookback_period
         if short_sma > long_sma && position == :out
-          @context.events.push Event.new(:signal, direction: :long)
+          @context.events.push Event.new(:signal, symbol: symbol, direction: :long)
           @positions[symbol] = :long
         elsif short_sma < long_sma && position == :long
-          @context.events.push Event.new(:signal, direction: :exit)
+          @context.events.push Event.new(:signal, symbol: symbol, direction: :exit)
           @positions[symbol] = :out
         end
       end

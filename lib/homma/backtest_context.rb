@@ -11,16 +11,16 @@ module Homma
       @start_date = nil || Date.new(2014, 01, 01)
       @end_date = nil || Date.today
       @current_date = @start_date
-      @symbols = %w{ AAPL FB }
-      @starting_capital = 10_000
-      @commission_per_trade = 25
+      @symbols = nil || %w{ AAPL FB MSFT ORCL }
+      @starting_capital = nil || 10_000
+      @commission_per_trade = nil || 25
 
       # components
       @logger = nil || Logger.new(STDOUT)
       @feeder = nil || YahooFinanceFeeder.new(self)
       @strategy = nil || MovingAverageCrossoverStrategy.new(self, 50, 250)
-      @broker = nil
-      @portfolio = nil
+      @portfolio = nil || Portfolio.new(self)
+      @broker = nil || BacktestBroker.new(self)
     end
 
     def start_trading
@@ -49,14 +49,17 @@ module Homma
             next
           end
 
-          @logger.info event.type
+          @logger.info "#{event.data[:symbol]}: #{event.type}"
           case event.type
           when :bar
             @strategy.on_bar event.data[:latest_bar]
+            @portfolio.on_bar event
           when :signal
-            @logger.debug event.data[:direction]
+            @portfolio.place_order event
           when :order
+            @broker.execute_order event
           when :fill
+            @portfolio.on_fill event
           else
             @logger.warn "Unknown event type #{event.type}"
           end
