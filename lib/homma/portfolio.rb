@@ -32,8 +32,7 @@ module Homma
           @current_holdings[symbol] = @current_positions[symbol] * bar[:adj_close]
         end
       end
-      @total = @cash + @commission +
-        @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
+      @total = @cash + @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
     end
 
     def on_fill event
