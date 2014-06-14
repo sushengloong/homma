@@ -52,14 +52,15 @@ module Homma
           @logger.info ">>> #{event.data[:symbol]}: #{event.type}"
           case event.type
           when :bar
-            @strategy.on_bar event.data[:latest_bar]
-            @portfolio.on_bar event
+            bar = event.data[:latest_bar]
+            @strategy.on_bar bar
+            @portfolio.on_bar bar
           when :signal
-            @portfolio.place_order event
+            @portfolio.place_order event.data[:symbol], event.data[:direction]
           when :order
-            @broker.execute_order event
+            @broker.execute_order event.data[:symbol], event.data[:direction], event.data[:quantity]
           when :fill
-            @portfolio.on_fill event
+            @portfolio.on_fill event.data[:symbol], event.data[:direction], event.data[:quantity]
           else
             @logger.warn "Unknown event type #{event.type}"
           end

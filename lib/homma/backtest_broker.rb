@@ -6,13 +6,13 @@ module Homma
     end
 
     # assuming order gets filled immediately
-    def execute_order event
+    def execute_order symbol, direction, quantity
       @context.events.push Event.new(
         :fill,
         datetime: Time.now,
-        symbol: event.data[:symbol],
-        direction: event.data[:direction],
-        quantity: event.data[:quantity],
+        symbol: symbol,
+        direction: direction,
+        quantity: quantity,
         cost: nil,
         remaining: 0
       )

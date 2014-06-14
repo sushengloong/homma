@@ -26,22 +26,20 @@ module Homma
       @total = 0.0
     end
 
-    def on_bar event
-      event.data[:latest_bar].each do |symbol, bar|
-        if !bar.nil? && bar.has_key?(:adj_close)
-          @current_holdings[symbol] = @current_positions[symbol] * bar[:adj_close]
+    def on_bar bar
+      bar.each do |symbol, data|
+        if !data.nil? && data.has_key?(:adj_close)
+          @current_holdings[symbol] = @current_positions[symbol] * data[:adj_close]
         end
       end
       @total = @cash + @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
     end
 
-    def on_fill event
-      symbol = event.data[:symbol]
-      quantity = event.data[:quantity]
+    def on_fill symbol, direction, quantity
       fill_cost = @context.feeder.market_data[symbol].last[:adj_close]
 
       # update positions
-      fill_direction = DIRECTION_MAPPING[event.data[:direction]].to_i
+      fill_direction = DIRECTION_MAPPING[direction].to_i
       @current_positions[symbol] += (fill_direction * quantity)
 
       order_fill_cost = @current_positions[symbol] * fill_cost
@@ -55,9 +53,7 @@ module Homma
       @total = @cash + @commission + @current_holdings[symbol]
     end
 
-    def place_order event
-      symbol = event.data[:symbol]
-      direction = event.data[:direction]
+    def place_order symbol, direction
       # max out order quantity with all cash we have
       order_quantity = ( (@cash - @commission_per_trade) / @context.feeder.market_data[symbol].last[:adj_close]).floor
       current_quantity = @current_positions[symbol]
