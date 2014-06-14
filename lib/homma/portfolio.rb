@@ -2,7 +2,7 @@ module Homma
   class Portfolio
 
     attr_accessor :current_positions, :current_holdings,
-      :cash, :commission, :total,
+      :cash, :commission, :total, :returns,
       :sharpe_ratios, :max_drawdowns, :drawdown_duration
 
     DIRECTION_MAPPING = {

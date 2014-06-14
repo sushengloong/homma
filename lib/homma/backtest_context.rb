@@ -73,6 +73,7 @@ module Homma
           @logger.info "Cash: #{@portfolio.cash.round(3)}"
           @logger.info "Commission: #{@portfolio.commission.round(3)}"
           @logger.info "Total: #{@portfolio.total.round(3)}"
+          @logger.info "Cumulative Returns: #{( (@portfolio.returns.values.inject(1.0){ |acc, r| acc * (1.0 + r) } - 1.0) * 100.0).round(3)}%"
           @logger.info "Sharpe Ratio: #{@portfolio.sharpe_ratios[date_str].round(3)}"
           @logger.info "Maximum Drawdown: #{( @portfolio.max_drawdowns[date_str] * 100 ).round(3)}%"
           @logger.info "Drawdown Duration: #{@portfolio.drawdown_duration[date_str]}"
