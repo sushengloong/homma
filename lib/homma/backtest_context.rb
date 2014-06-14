@@ -72,6 +72,7 @@ module Homma
           @logger.info "Cash: #{@portfolio.cash.round(3)}"
           @logger.info "Commission: #{@portfolio.commission.round(3)}"
           @logger.info "Total: #{@portfolio.total.round(3)}"
+          @logger.info "Sharpe Ratio: #{@portfolio.sharpe_ratios[@current_date.strftime('%Y-%m-%d')].round(3)}"
 
         end # inner loop
       end # outer loop

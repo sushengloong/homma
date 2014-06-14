@@ -2,7 +2,7 @@ module Homma
   class Portfolio
 
     attr_accessor :current_positions, :current_holdings,
-      :cash, :commission, :total
+      :cash, :commission, :total, :sharpe_ratios
 
     DIRECTION_MAPPING = {
       buy: 1,
@@ -21,10 +21,10 @@ module Homma
         h.merge(symbol => 0.0)
       end
 
-      @cash = @context.starting_capital
+      @cash = @total = @context.starting_capital.to_f
       @commission = 0.0
-      @total = @context.starting_capital
       @returns = {}
+      @sharpe_ratios = {}
     end
 
     def on_bar bar
@@ -34,7 +34,9 @@ module Homma
         end
       end
       new_total = @cash + @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
-      @returns[@context.current_date.strftime('%Y-%m-%d')] = new_total / @total
+      date_str = @context.current_date.strftime('%Y-%m-%d')
+      @returns[date_str] = new_total / @total - 1
+      @sharpe_ratios[date_str] = calculate_sharpe_ratio @returns.values, @returns.length
       @total = new_total
     end
 
@@ -70,6 +72,12 @@ module Homma
                          [:buy, current_quantity.to_i.abs]
                        end
       @context.events.push Event.new(:order, symbol: symbol, direction: direction, quantity: quantity)
+    end
+
+    private
+
+    def calculate_sharpe_ratio returns, periods
+      Math.sqrt(periods) * Math.mean(returns) / Math.std(returns)
     end
 
   end
