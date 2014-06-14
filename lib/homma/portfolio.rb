@@ -23,7 +23,8 @@ module Homma
 
       @cash = @context.starting_capital
       @commission = 0.0
-      @total = 0.0
+      @total = @context.starting_capital
+      @returns = {}
     end
 
     def on_bar bar
@@ -32,7 +33,9 @@ module Homma
           @current_holdings[symbol] = @current_positions[symbol] * data[:adj_close]
         end
       end
-      @total = @cash + @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
+      new_total = @cash + @current_holdings.inject(0) { |sum, (symbol, value)| sum + value }
+      @returns[@context.current_date.strftime('%Y-%m-%d')] = new_total / @total
+      @total = new_total
     end
 
     def on_fill symbol, direction, quantity
@@ -50,7 +53,7 @@ module Homma
       @current_holdings[symbol] += order_fill_cost
       @commission += order_commission
       @cash -= order_total_cost
-      @total = @cash + @commission + @current_holdings[symbol]
+      @total = @cash + @current_holdings[symbol]
     end
 
     def place_order symbol, direction
