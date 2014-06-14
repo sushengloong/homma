@@ -2,7 +2,8 @@ module Homma
   class Portfolio
 
     attr_accessor :current_positions, :current_holdings,
-      :cash, :commission, :total, :sharpe_ratios
+      :cash, :commission, :total,
+      :sharpe_ratios, :max_drawdowns, :drawdown_duration
 
     DIRECTION_MAPPING = {
       buy: 1,
@@ -25,6 +26,8 @@ module Homma
       @commission = 0.0
       @returns = {}
       @sharpe_ratios = {}
+      @max_drawdowns = {}
+      @drawdown_duration = {}
     end
 
     def on_bar bar
@@ -37,6 +40,7 @@ module Homma
       date_str = @context.current_date.strftime('%Y-%m-%d')
       @returns[date_str] = new_total / @total - 1
       @sharpe_ratios[date_str] = calculate_sharpe_ratio @returns.values, @returns.length
+      @max_drawdowns[date_str], @drawdown_duration[date_str] = calculate_drawdowns @returns
       @total = new_total
     end
 
@@ -78,6 +82,22 @@ module Homma
 
     def calculate_sharpe_ratio returns, periods
       Math.sqrt(periods) * Math.mean(returns) / Math.std(returns)
+    end
+
+    def calculate_drawdowns returns
+      drawdown = {}
+      duration = {}
+      highest_watermark = {}
+      date_format = '%Y-%m-%d'
+      @context.start_date.upto(@context.end_date) do |date|
+        prev_date_str = (date - 1).strftime date_format
+        date_str = date.strftime date_format
+        watermark = [ highest_watermark[prev_date_str].to_f, returns[date_str].to_f ].max
+        highest_watermark[date_str] = watermark
+        drawdown[date_str] = highest_watermark[date_str].to_f - returns[date_str].to_f
+        duration[date_str] = drawdown[date_str] == 0 ? 0 : duration[prev_date_str] + 1
+      end
+      [ drawdown.values.max, duration.values.max ]
     end
 
   end

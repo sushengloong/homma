@@ -65,6 +65,7 @@ module Homma
             @logger.warn "Unknown event type #{event.type}"
           end
 
+          date_str = @current_date.strftime('%Y-%m-%d')
           @logger.info "Current Position:"
           @logger.info @portfolio.current_positions
           @logger.info "Current Holding:"
@@ -72,7 +73,9 @@ module Homma
           @logger.info "Cash: #{@portfolio.cash.round(3)}"
           @logger.info "Commission: #{@portfolio.commission.round(3)}"
           @logger.info "Total: #{@portfolio.total.round(3)}"
-          @logger.info "Sharpe Ratio: #{@portfolio.sharpe_ratios[@current_date.strftime('%Y-%m-%d')].round(3)}"
+          @logger.info "Sharpe Ratio: #{@portfolio.sharpe_ratios[date_str].round(3)}"
+          @logger.info "Maximum Drawdown: #{( @portfolio.max_drawdowns[date_str] * 100 ).round(3)}%"
+          @logger.info "Drawdown Duration: #{@portfolio.drawdown_duration[date_str]}"
 
         end # inner loop
       end # outer loop
