@@ -70,7 +70,7 @@ module Homma
                          [:buy, order_quantity]
                        elsif direction == :short && current_quantity == 0
                          [:sell, order_quantity]
-                       elsif direction == :exit && currrent_quantity > 0
+                       elsif direction == :exit && current_quantity > 0
                          [:sell, current_quantity.to_i.abs]
                        elsif direction == :exit && current_quantity < 0
                          [:buy, current_quantity.to_i.abs]
