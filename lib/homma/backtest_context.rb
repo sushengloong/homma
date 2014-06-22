@@ -56,7 +56,7 @@ module Homma
             @strategy.on_bar bar
             @portfolio.on_bar bar
           when :signal
-            @portfolio.place_order event.data[:symbol], event.data[:direction]
+            @portfolio.place_order event.data[:symbol], event.data[:direction], event.data[:strength]
           when :order
             @broker.execute_order event.data[:symbol], event.data[:direction], event.data[:quantity]
           when :fill

@@ -49,9 +49,10 @@ module Homma
 
       # update positions
       fill_direction = DIRECTION_MAPPING[direction].to_i
-      @current_positions[symbol] += (fill_direction * quantity)
+      position_changed = fill_direction * quantity
+      @current_positions[symbol] += position_changed
 
-      order_fill_cost = @current_positions[symbol] * fill_cost
+      order_fill_cost = position_changed * fill_cost
       order_commission = @commission_per_trade # assuming flat commission per trade
       order_total_cost = order_fill_cost + order_commission
 
@@ -62,9 +63,12 @@ module Homma
       @total = @cash + @current_holdings[symbol]
     end
 
-    def place_order symbol, direction
-      # max out order quantity with all cash we have
-      order_quantity = ( (@cash - @commission_per_trade) / @context.feeder.market_data[symbol].last[:adj_close]).floor
+    def place_order symbol, direction, strength
+      order_quantity = (100 * strength).floor
+
+      # ensure we only buy/sell shares within our means
+      #max_order_quantity = ( (@cash - @commission_per_trade) / @context.feeder.market_data[symbol].last[:adj_close]).floor
+
       current_quantity = @current_positions[symbol]
       direction, quantity = if direction == :long && current_quantity == 0
                          [:buy, order_quantity]
