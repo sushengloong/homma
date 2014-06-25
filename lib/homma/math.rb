@@ -1,7 +1,7 @@
 module Math
 
   def self.sum array
-    array.inject(0) { |acc, x| acc + x }
+    array.inject :+
   end
 
   def self.mean array
