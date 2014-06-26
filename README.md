@@ -1,24 +1,16 @@
 # Homma
 
-TODO: Write a gem description
+A proof of concept of a Ruby-based algorithmic trading backtesting system.
+
+The project is named after Homma Munehisa who is known as the father of candlestick charting.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'homma'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install homma
+I plan to gemify this project in the future but for now let's just clone this repository.
 
 ## Usage
 
-TODO: Write usage instructions here
+`rake` to run tests.
 
 ## Contributing
 
